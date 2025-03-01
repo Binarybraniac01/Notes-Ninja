@@ -1,7 +1,11 @@
 docx
+email_validator
 Flask
+Flask-SQLAlchemy
 google-genai
 google-generativeai
 gunicorn
 pillow
+psycopg2-binary
 python-docx
+Werkzeug
