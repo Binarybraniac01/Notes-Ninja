@@ -107,7 +107,7 @@ def generate_answers(subject, text, question_format='short_answer'):
             "temperature": 0.7,
             "top_p": 1,
             "top_k": 1,
-            "max_output_tokens": 2048,
+            "max_output_tokens": 10000,
         }
 
         response = model.generate_content(
