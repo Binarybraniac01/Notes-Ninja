@@ -1,0 +1,12 @@
+docx
+email-validator
+flask
+flask-sqlalchemy
+google-generativeai
+gunicorn
+openai
+pillow
+psycopg2-binary
+pytesseract
+python-docx
+werkzeug
