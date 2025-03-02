@@ -39,7 +39,7 @@ def identify_questions(text: str) -> List[str]:
                 questions.append(question_text)
         
         # Look for common question starters
-        starters = ['explain', 'describe', 'discuss', 'analyze', 'compare', 'what', 'how', 'why']
+        starters = ['explain', 'describe', 'discuss', 'analyze', 'compare', 'what', 'how', 'why', 'give', 'write', 'differenciate']
         lower_line = line.lower()
         if any(lower_line.startswith(starter) for starter in starters):
             if len(line) > 10:  # Avoid short fragments
@@ -67,5 +67,7 @@ Questions to analyze and answer:
         structured_text += f"\nQuestion {i}:\n{question}\n"
     
     structured_text += f"\nPlease provide detailed answers following these requirements:\n{format_info.get('instructions', '')}"
+
+    # structured_text += f"\nMake use of HTML to highlight elements and structure the document and other important things."
     
     return structured_text.strip()

@@ -26,7 +26,7 @@ def get_format_instructions(question_format):
         'short_answer': {
             'marks': 5,
             'instructions': """
-                - Provide a concise response (2-3 paragraphs)
+                - Provide a concise response (2-3 paragraphs or 10 points)
                 - Focus on key concepts and definitions
                 - Include one relevant example
                 - Use simple, clear language

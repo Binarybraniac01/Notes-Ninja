@@ -3,13 +3,74 @@ from docx.shared import Pt
 import tempfile
 import os
 import logging
+import re
 from question_parser import identify_questions
 
 logger = logging.getLogger(__name__)
 
+def apply_custom_formatting(doc):
+    """
+    Apply custom formatting to the document:
+      1. Text between ** and ** is made bold. 
+         If the inner text starts with "Question", set its font size to 14 pt.
+      2. If a paragraph starts with an asterisk (*) followed by whitespace,
+         remove the marker and set the paragraph style to "List Bullet".
+    """
+    # Regular expression for bold marker: captures text between ** and **
+    bold_pattern = re.compile(r'(\*\*.*?\*\*)')
+    
+    for para in doc.paragraphs:
+        original_text = para.text
+        
+        # Check if the paragraph starts with a bullet marker (e.g., "* ")
+        bullet_match = re.match(r'^\*\s+', original_text)
+        is_bullet = bool(bullet_match)
+        if is_bullet:
+            # Remove the bullet marker from the text
+            text = re.sub(r'^\*\s+', '', original_text)
+        else:
+            text = original_text
+        
+        # Remove all runs from the paragraph so we can rebuild it cleanly.
+        p_element = para._element
+        for run in list(para.runs):
+            p_element.remove(run._element)
+        
+        # Split the text while preserving the bold markers.
+        parts = re.split(bold_pattern, text)
+        
+        # Rebuild the paragraph by adding new runs with formatting.
+        for part in parts:
+            # Check if the part matches the **...** pattern.
+            m = re.match(r'\*\*(.*?)\*\*', part)
+            if m:
+                inner_text = m.group(1)
+                run = para.add_run(inner_text)
+                run.bold = True
+                # If the bold text starts with "Question", enlarge the font size.
+                if inner_text.strip().startswith("Question"):
+                    run.font.size = Pt(14)
+            else:
+                para.add_run(part)
+        
+        # If this paragraph originally started with a bullet marker, update its style.
+        if is_bullet:
+            para.style = 'List Bullet'
+
+
+def extract_questions(text):
+    pattern = r"(\n\n\*\*Question.*?)(?=\n\n\*\*Question|$)"
+    matches = re.findall(pattern, text, re.DOTALL)
+    return [match.strip() for match in matches]
+
+
 def create_document(subject, questions_text, answers):
     """
-    Create a formatted Word document with questions and answers
+    Create a formatted Word document with questions and answers.
+    The document is further processed to apply custom formatting:
+      1. Bold text formatting for text between ** and **.
+         (If the bold text begins with "Question", the font is enlarged.)
+      2. Convert paragraphs starting with an asterisk (*) into bullet points.
     """
     try:
         doc = Document()
@@ -18,38 +79,62 @@ def create_document(subject, questions_text, answers):
         title = doc.add_heading(f'{subject} - Exam Answers', 0)
         title.alignment = 1  # Center alignment
 
-        # Identify questions
-        questions = identify_questions(questions_text)
 
-        # Split answers if multiple questions
-        answer_sections = answers.split('\nQuestion') if '\nQuestion' in answers else [answers]
+        #----------------New Format-------#
 
-        # Add content sections
-        if questions and len(questions) > 1:
-            # Multiple questions format
-            for i, (question, answer) in enumerate(zip(questions, answer_sections), 1):
-                # Add question section
-                doc.add_heading(f'Question {i}:', level=1)
-                doc.add_paragraph(question)
+        cleaned_text = '\n\n**Question 1' + answers.split('\n\n**Question 1', 1)[-1]
 
-                # Add answer section
-                doc.add_heading(f'Answer {i}:', level=2)
-                # Clean up the answer text
-                answer_text = answer.replace(f'{i}:', '').strip()
-                doc.add_paragraph(answer_text)
+        answer_sections = extract_questions(cleaned_text)
 
-                # Add separator except for last question
-                if i < len(questions):
-                    doc.add_paragraph('---')
-        else:
-            # Single question/context format
-            doc.add_heading('Question Context:', level=1)
-            doc.add_paragraph(questions_text)
+        print("Answer sections:", answer_sections)
 
-            doc.add_heading('Answer:', level=1)
-            doc.add_paragraph(answers)
+        for ans in answer_sections:
+            doc.add_paragraph(ans)
+            doc.add_paragraph()
+            doc.add_paragraph()
 
-        # Save document
+
+        #-----------------END-------------#
+
+
+
+        # # Identify questions
+        # questions = identify_questions(questions_text)
+
+        # # Split answers if multiple questions exist
+        # answer_sections = answers.split('\nQuestion') if '\nQuestion' in answers else [answers]
+
+        # # Add content sections
+        # if questions and len(questions) > 1:
+        #     # Format multiple questions
+        #     for i, (question, answer) in enumerate(zip(questions, answer_sections), 1): 
+
+        #         # Add question section
+        #         doc.add_heading(f'Question {i}:', level=1)
+        #         doc.add_paragraph(question)
+
+        #         # Add answer section
+        #         doc.add_heading(f'Answer {i}:', level=2)
+        #         # Clean up the answer text before adding
+        #         answer_text = answer.replace(f'{i}:', '').strip()
+        #         doc.add_paragraph(answer_text)
+
+        #         # Add a separator if this isn't the last question
+        #         if i < len(questions):
+        #             doc.add_paragraph('---')
+        # else:
+        #     # Single question/context format
+        #     doc.add_heading('Question Context:', level=1)
+        #     doc.add_paragraph(questions_text)
+
+        #     doc.add_heading('Answer:', level=1)
+        #     doc.add_paragraph(answers)
+
+
+        # Apply custom formatting to process patterns in all paragraphs.
+        apply_custom_formatting(doc)
+
+        # Save the document to a temporary path.
         temp_path = os.path.join(tempfile.gettempdir(), 'exam_answers.docx')
         doc.save(temp_path)
 
@@ -57,3 +142,5 @@ def create_document(subject, questions_text, answers):
     except Exception as e:
         logger.error(f"Error creating document: {str(e)}")
         raise Exception("Failed to create document")
+
+
