@@ -23,13 +23,32 @@ def get_format_instructions(question_format):
     Get specific instructions based on question format
     """
     format_instructions = {
+        'definition': {
+            'marks': 2,
+            'instructions': """
+                - Provide clear, precise definitions
+                - Give a brief example
+                - Keep response focused and concise
+                """
+        },
         'short_answer': {
             'marks': 5,
             'instructions': """
-                - Provide a concise response (2-3 paragraphs or 10 points)
-                - Focus on key concepts and definitions
-                - Include one relevant example
+                - Structure answer suitble for 5 marks question maintaining better readability.
                 - Use simple, clear language
+                - Focus on key concepts and definitions
+                - Include relevant example if necessary
+                - Provide reference links for diagrams, do not draw them.
+                """
+        },
+        'long_answer': {
+            'marks': 10,
+            'instructions': """
+                - Give answer suitble for 10 marks question maintaining better readability
+                - Use simple, clear language
+                - Focus on key concepts and definitions
+                - Include relevant examples if necessary
+                - Provide reference links for diagrams, do not draw them.
                 """
         },
         'essay': {
@@ -40,16 +59,7 @@ def get_format_instructions(question_format):
                 - Provide multiple examples and case studies
                 - Present arguments with supporting evidence
                 - Include a brief conclusion
-                """
-        },
-        'problem_solving': {
-            'marks': 10,
-            'instructions': """
-                - Break down the problem systematically
-                - Show step-by-step solution process
-                - Explain the reasoning at each step
-                - Include relevant calculations or diagrams
-                - Verify the solution
+                - If there are digrams in answer then simply give refrence link to it do not draw digram in answer
                 """
         },
         'analysis': {
@@ -61,15 +71,18 @@ def get_format_instructions(question_format):
                 - Cite relevant examples and research
                 - Draw well-reasoned conclusions
                 - Consider implications and applications
+                - If there are digrams in answer then simply give refrence link to it do not draw digram in answer
+
                 """
         },
-        'definition': {
-            'marks': 3,
+        'Math_Problem': {
+            'marks': None,
             'instructions': """
-                - Provide clear, precise definitions
-                - Include key characteristics
-                - Give a brief example
-                - Keep response focused and concise
+                - Solve the Mathematical problem given 
+                - Keep explanation concise and include only necessary stuff
+                - verify given solution, but do not include it in answer
+                - Include relevant calculations
+                - Provide reference links for diagrams if necessary, do not draw them. 
                 """
         }
     }
@@ -84,11 +97,14 @@ def generate_answers(subject, text, question_format='short_answer'):
         model = genai.GenerativeModel('gemini-2.0-flash')
         logger.info(f"Initialized model for subject: {subject}")
 
-        # Identify questions from the text
-        questions = identify_questions(text)
-        if not questions:
-            logger.warning("No specific questions identified, treating entire text as context")
-            questions = [text]
+        
+        #questions = identify_questions(text) 
+        # if not questions:
+        #     logger.warning("No specific questions identified, treating entire text as context")
+        #     questions = [text]
+
+        questions = [text]
+
 
         format_info = get_format_instructions(question_format)
 

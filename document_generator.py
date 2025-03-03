@@ -79,7 +79,6 @@ def create_document(subject, questions_text, answers):
         title = doc.add_heading(f'{subject} - Exam Answers', 0)
         title.alignment = 1  # Center alignment
 
-
         #----------------New Format-------#
 
         cleaned_text = '\n\n**Question 1' + answers.split('\n\n**Question 1', 1)[-1]
@@ -92,44 +91,7 @@ def create_document(subject, questions_text, answers):
             doc.add_paragraph(ans)
             doc.add_paragraph()
             doc.add_paragraph()
-
-
         #-----------------END-------------#
-
-
-
-        # # Identify questions
-        # questions = identify_questions(questions_text)
-
-        # # Split answers if multiple questions exist
-        # answer_sections = answers.split('\nQuestion') if '\nQuestion' in answers else [answers]
-
-        # # Add content sections
-        # if questions and len(questions) > 1:
-        #     # Format multiple questions
-        #     for i, (question, answer) in enumerate(zip(questions, answer_sections), 1): 
-
-        #         # Add question section
-        #         doc.add_heading(f'Question {i}:', level=1)
-        #         doc.add_paragraph(question)
-
-        #         # Add answer section
-        #         doc.add_heading(f'Answer {i}:', level=2)
-        #         # Clean up the answer text before adding
-        #         answer_text = answer.replace(f'{i}:', '').strip()
-        #         doc.add_paragraph(answer_text)
-
-        #         # Add a separator if this isn't the last question
-        #         if i < len(questions):
-        #             doc.add_paragraph('---')
-        # else:
-        #     # Single question/context format
-        #     doc.add_heading('Question Context:', level=1)
-        #     doc.add_paragraph(questions_text)
-
-        #     doc.add_heading('Answer:', level=1)
-        #     doc.add_paragraph(answers)
-
 
         # Apply custom formatting to process patterns in all paragraphs.
         apply_custom_formatting(doc)
