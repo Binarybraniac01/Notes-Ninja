@@ -1,0 +1,89 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-body">
+                <h2 class="card-title text-center mb-4">Generate Exam Notes</h2>
+
+                <form id="examForm" method="POST" action="{{ url_for('process') }}" enctype="multipart/form-data">
+                    <div class="mb-3">
+                        <label for="subject" class="form-label">Subject</label>
+                        <input type="text" class="form-control" id="subject" name="subject" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="question_format" class="form-label">Question Format</label>
+                        <select class="form-select" id="question_format" name="question_format" required>
+                            <option value="definition">Definition/Concept (3 marks)</option>
+                            <option value="short_answer">Short Answer (5 marks)</option>
+                            <option value="long_answer">Long Answer (10 marks)</option>
+                            <option value="Math_Problem">Math Problems</option>
+                            <option value="essay">Essay (15 marks)</option>
+                            <option value="analysis">Critical Analysis (20 marks)</option>
+                        </select>
+                        <div class="form-text">Select the type of question format for the answers.</div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="text_input" class="form-label">Enter Text or Questions</label>
+            
+                        <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24"
+                            width="24px" fill="#FFFFFF" class="popover-trigger" 
+                            data-bs-container="body" data-bs-toggle="popover"
+                            data-bs-placement="top" data-bs-content="Note : Enter new question on new line."
+                            data-bs-trigger="hover" 
+                            style="cursor: pointer; margin-left: 10px;">
+                            <path d="M0 0h24v24H0z" fill="none"/>
+                            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/>
+                        </svg>
+
+                        <textarea class="form-control" id="text_input" name="text_input" rows="5"></textarea>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="files" class="form-label">Or Upload Images</label>
+
+                        <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24"
+                            width="24px" fill="#FFFFFF" class="popover-trigger" 
+                            data-bs-container="body" data-bs-toggle="popover"
+                            data-bs-placement="top" data-bs-content="Note : Makes sure that images are properly crop with only questions visible."
+                            data-bs-trigger="hover" 
+                            style="cursor: pointer; margin-left: 10px;">
+                            <path d="M0 0h24v24H0z" fill="none"/>
+                            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/>
+                        </svg>
+                        
+                        <input type="file" class="form-control" id="files" name="files[]" accept="image/*" multiple>
+                        <div class="form-text">You can select multiple images to process at once.</div>
+                    </div>
+
+                    <div id="imagePreview" class="mb-3 row g-2">
+                        <!-- Image previews will be inserted here -->
+                    </div>
+
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-primary" id="submitBtn">
+                            <span class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
+                            Generate Answers
+                        </button>
+                        <div class="form-text">You will get all Q/A in .docx file that will be downloaded automatically.</div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="position-fixed bottom-0 end-0 p-3" style="z-index: 11">
+    <div id="toastError" class="toast align-items-center text-white bg-danger border-0" role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="d-flex">
+            <div class="toast-body">
+                File size exceeds the maximum limit (16MB) or invalid file type.
+            </div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+    </div>
+</div>
+{% endblock %}

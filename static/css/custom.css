@@ -1,0 +1,22 @@
+/* Minimal custom styles to complement Bootstrap */
+.card {
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.spinner-border {
+    margin-right: 8px;
+}
+
+/* Custom form styling */
+.form-control:focus {
+    border-color: var(--bs-primary);
+    box-shadow: 0 0 0 0.25rem rgba(var(--bs-primary-rgb), 0.25);
+}
+
+/* Toast positioning */
+.toast {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+}
